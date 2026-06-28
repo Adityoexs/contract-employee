@@ -20,3 +20,17 @@ type KaryawanRequest struct {
 	TanggalMulai string `json:"tanggal_mulai"`
 	TanggalHabis string `json:"tanggal_habis"`
 }
+
+// ImportRow represents a validated row from an Excel import file.
+type ImportRow struct {
+	Nama         string `json:"nama"`
+	TanggalMulai string `json:"tanggal_mulai"`
+	TanggalHabis string `json:"tanggal_habis"`
+}
+
+// ImportError represents a validation error for a specific row in an import file.
+type ImportError struct {
+	Row     int    `json:"row"`
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}

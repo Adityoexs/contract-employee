@@ -28,4 +28,29 @@ export const karyawanService = {
   delete(id: number): Promise<ApiResponse> {
     return http.delete<ApiResponse>(`/karyawan/${id}`).then((r) => r.data);
   },
+
+  downloadTemplate(): Promise<void> {
+    return http
+      .get('/karyawan/import/template', { responseType: 'blob' })
+      .then((r) => {
+        const url = URL.createObjectURL(r.data as Blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'template_karyawan.xlsx';
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+  },
+
+  importExcel(file: File): Promise<ApiResponse<{ inserted: number }>> {
+    const form = new FormData();
+    form.append('file', file);
+    return axios
+      .post<ApiResponse<{ inserted: number }>>(
+        `${import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api'}/karyawan/import`,
+        form,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      )
+      .then((r) => r.data);
+  },
 };

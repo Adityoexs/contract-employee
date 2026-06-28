@@ -44,7 +44,7 @@ func main() {
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
-		ExposeHeaders:    []string{"Content-Length"},
+		ExposeHeaders:    []string{"Content-Length", "Content-Disposition"},
 		AllowCredentials: false,
 	}))
 
@@ -58,6 +58,8 @@ func main() {
 			karyawan.POST("", h.Create)
 			karyawan.PUT("/:id", h.Update)
 			karyawan.DELETE("/:id", h.Delete)
+			karyawan.POST("/import", h.ImportExcel)
+			karyawan.GET("/import/template", h.DownloadTemplate)
 		}
 	}
 
