@@ -4,14 +4,14 @@ import { toast } from 'react-hot-toast';
 import { isAxiosError } from 'axios';
 import KaryawanForm from '../components/KaryawanForm';
 import { karyawanService } from '../services/karyawanService';
-import type { KaryawanRequest } from '../types/karyawan';
+import type { KaryawanCreateRequest } from '../types/karyawan';
 
 export default function CreatePage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverErrors, setServerErrors] = useState<Record<string, string> | undefined>();
 
-  const handleSubmit = async (data: KaryawanRequest) => {
+  const handleSubmit = async (data: KaryawanCreateRequest) => {
     setIsSubmitting(true);
     setServerErrors(undefined);
     try {

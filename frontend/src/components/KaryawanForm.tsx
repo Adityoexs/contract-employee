@@ -2,14 +2,10 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { KaryawanRequest } from '../types/karyawan';
+import type { KaryawanCreateRequest } from '../types/karyawan';
 
 const schema = z
   .object({
-    // kode: z
-    //   .string()
-    //   .min(1, 'Kode wajib diisi')
-    //   .refine((v) => v.trim().length > 0, 'Kode tidak boleh hanya spasi'),
     nama: z
       .string()
       .min(1, 'Nama wajib diisi')
@@ -31,8 +27,8 @@ const schema = z
 type FormValues = z.infer<typeof schema>;
 
 interface Props {
-  defaultValues?: Partial<KaryawanRequest>;
-  onSubmit: (data: KaryawanRequest) => Promise<void>;
+  defaultValues?: Partial<KaryawanCreateRequest>;
+  onSubmit: (data: KaryawanCreateRequest) => Promise<void>;
   serverErrors?: Record<string, string>;
   isSubmitting?: boolean;
   submitLabel?: string;
@@ -53,7 +49,6 @@ export default function KaryawanForm({
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      // kode: defaultValues?.kode ?? '',
       nama: defaultValues?.nama ?? '',
       tanggal_mulai: defaultValues?.tanggal_mulai?.slice(0, 10) ?? '',
       tanggal_habis: defaultValues?.tanggal_habis?.slice(0, 10) ?? '',
@@ -72,12 +67,6 @@ export default function KaryawanForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="form">
-      {/* <div className="form-group">
-        <label htmlFor="kode">Kode Karyawan <span className="required">*</span></label>
-        <input id="kode" type="text" placeholder="Contoh: EMP001" {...register('kode')} />
-        {errors.kode && <p className="field-error">{errors.kode.message}</p>}
-      </div> */}
-
       <div className="form-group">
         <label htmlFor="nama">Nama <span className="required">*</span></label>
         <input id="nama" type="text" placeholder="Nama lengkap karyawan" {...register('nama')} />

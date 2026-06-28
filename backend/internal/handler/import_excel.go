@@ -17,6 +17,7 @@ import (
 const (
 	maxImportSize = 500 * 1024 // 500 KB
 	importSheet   = "Karyawan"
+	dateLayout    = "2006-01-02"
 )
 
 // ImportExcel godoc – POST /api/karyawan/import
@@ -82,14 +83,14 @@ func (h *KaryawanHandler) ImportExcel(c *gin.Context) {
 		return
 	}
 
-	startSeq, err := h.repo.FindMaxKodeSequence()
+	startSeq, err := h.svc.FindMaxKodeSequence()
 	if err != nil {
 		respond(c, http.StatusInternalServerError, "Gagal membaca data kode", nil, err.Error())
 		return
 	}
 	startSeq++ // first new kode is max+1
 
-	inserted, err := h.repo.BulkCreate(rows, startSeq)
+	inserted, err := h.svc.BulkCreate(rows, startSeq)
 	if err != nil {
 		respond(c, http.StatusInternalServerError, "Gagal menyimpan data", nil, err.Error())
 		return

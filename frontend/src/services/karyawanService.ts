@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { ApiResponse, Karyawan, KaryawanRequest } from '../types/karyawan';
+import type { ApiResponse, Karyawan, KaryawanCreateRequest, KaryawanUpdateRequest } from '../types/karyawan';
 
 const http = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api',
@@ -15,11 +15,11 @@ export const karyawanService = {
     return http.get<ApiResponse<Karyawan>>(`/karyawan/${id}`).then((r) => r.data);
   },
 
-  create(data: KaryawanRequest): Promise<ApiResponse<Karyawan>> {
+  create(data: KaryawanCreateRequest): Promise<ApiResponse<Karyawan>> {
     return http.post<ApiResponse<Karyawan>>('/karyawan', data).then((r) => r.data);
   },
 
-  update(id: number, data: KaryawanRequest): Promise<ApiResponse<Karyawan>> {
+  update(id: number, data: KaryawanUpdateRequest): Promise<ApiResponse<Karyawan>> {
     return http
       .put<ApiResponse<Karyawan>>(`/karyawan/${id}`, data)
       .then((r) => r.data);

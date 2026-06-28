@@ -109,13 +109,17 @@ func (r *KaryawanRepository) Create(req model.KaryawanCreateRequest) (*model.Kar
 	}
 
 	var k model.Karyawan
-	err = r.db.QueryRow(
+	err = tx.QueryRow(
 		`INSERT INTO public.karyawan_kontrak (kode, nama, tanggal_mulai, tanggal_habis)
 		 VALUES ($1, $2, $3, $4)
 		 RETURNING id, kode, nama, tanggal_mulai, tanggal_habis, created_at, updated_at`,
 		kode, strings.TrimSpace(req.Nama), tm, th,
 	).Scan(&k.ID, &k.Kode, &k.Nama, &k.TanggalMulai, &k.TanggalHabis, &k.CreatedAt, &k.UpdatedAt)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 	return &k, nil

@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast';
 import { isAxiosError } from 'axios';
 import KaryawanUpdateForm from '../components/KaryawanUpdateForm';
 import { karyawanService } from '../services/karyawanService';
-import type { Karyawan, KaryawanRequest } from '../types/karyawan';
+import type { Karyawan, KaryawanUpdateRequest } from '../types/karyawan';
 
 export default function EditPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +23,7 @@ export default function EditPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleSubmit = async (formData: KaryawanRequest) => {
+  const handleSubmit = async (formData: KaryawanUpdateRequest) => {
     if (!id) return;
     setIsSubmitting(true);
     setServerErrors(undefined);
