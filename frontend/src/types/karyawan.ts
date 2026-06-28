@@ -15,8 +15,14 @@ export interface KaryawanRequest {
   tanggal_habis: string;
 }
 
+export interface ImportError {
+  row: number;
+  field: string;
+  message: string;
+}
+
 export interface ApiResponse<T = unknown> {
   message: string;
   data?: T;
-  errors?: Record<string, string> | string;
+  errors?: Record<string, string> | string | ImportError[];
 }

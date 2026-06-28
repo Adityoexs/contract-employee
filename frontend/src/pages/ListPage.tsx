@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { karyawanService } from '../services/karyawanService';
-import type { Karyawan } from '../types/karyawan';
+import type { ImportError, Karyawan } from '../types/karyawan';
 
 function formatDate(iso: string): string {
   if (!iso) return '-';
@@ -12,6 +12,8 @@ function formatDate(iso: string): string {
 export default function ListPage() {
   const [list, setList] = useState<Karyawan[]>([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -40,13 +42,81 @@ export default function ListPage() {
     }
   };
 
+  const handleDownloadTemplate = async () => {
+    try {
+      await karyawanService.downloadTemplate();
+      toast.success('Template berhasil diunduh');
+    } catch {
+      toast.error('Gagal mengunduh template');
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset input so the same file can be re-selected if needed.
+    e.target.value = '';
+
+    setImporting(true);
+    try {
+      const res = await karyawanService.importExcel(file);
+      const inserted = res.data?.inserted ?? 0;
+      toast.success(`Import berhasil: ${inserted} data ditambahkan`);
+      fetchData();
+    } catch (err: unknown) {
+      // Try to surface validation errors from the backend response.
+      const axiosErr = err as { response?: { data?: { message?: string; errors?: unknown } } };
+      const detail = axiosErr?.response?.data;
+      if (detail?.errors && Array.isArray(detail.errors)) {
+        const msgs = (detail.errors as ImportError[])
+          .slice(0, 3)
+          .map((e) => `Baris ${e.row} (${e.field}): ${e.message}`)
+          .join('\n');
+        toast.error(`Import gagal:\n${msgs}`, { duration: 6000 });
+      } else {
+        toast.error(detail?.message ?? 'Import gagal');
+      }
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <div className="container">
       <div className="page-header">
         <h1>Daftar Karyawan Kontrak</h1>
-        <Link to="/create" className="btn btn-primary">
-          + Tambah Karyawan
-        </Link>
+        <div className="actions">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleDownloadTemplate}
+          >
+            ⬇ Template Excel
+          </button>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={handleImportClick}
+            disabled={importing}
+          >
+            {importing ? 'Mengimpor...' : '⬆ Import Excel'}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
+          <Link to="/create" className="btn btn-primary">
+            + Tambah Karyawan
+          </Link>
+        </div>
       </div>
 
       {loading ? (
