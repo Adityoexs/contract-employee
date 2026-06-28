@@ -3,6 +3,7 @@ package handler
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -93,11 +94,14 @@ func validateRequest(req model.KaryawanRequest, excludeID int, repo *repository.
 
 // GetAll godoc – GET /api/karyawan
 func (h *KaryawanHandler) GetAll(c *gin.Context) {
+	log.Println("GetAll hit")
 	list, err := h.repo.FindAll()
 	if err != nil {
+		log.Printf("FindAll error: %#v\n", err)
 		respond(c, http.StatusInternalServerError, "Gagal mengambil data", nil, err.Error())
 		return
 	}
+	log.Printf("FindAll success: %d rows\n", len(list))
 	if list == nil {
 		list = []model.Karyawan{}
 	}

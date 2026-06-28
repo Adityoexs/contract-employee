@@ -26,6 +26,12 @@ func main() {
 	defer dbConn.Close()
 	log.Println("Database connected successfully")
 
+	var currentDB, currentSchema, searchPath string
+	if err := dbConn.QueryRow("SELECT current_database(), current_schema(), current_setting('search_path')").Scan(&currentDB, &currentSchema, &searchPath); err != nil {
+		log.Fatalf("Failed to inspect DB: %v", err)
+	}
+	log.Printf("MAIN connected to database=%s schema=%s search_path=%s", currentDB, currentSchema, searchPath)
+
 	// Repository & Handler
 	repo := repository.NewKaryawanRepository(dbConn)
 	h := handler.NewKaryawanHandler(repo)
@@ -64,4 +70,9 @@ func main() {
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
+	log.Println("STARTUP: main entered")
+	log.Println("DB_NAME:", os.Getenv("DB_NAME"))
+	log.Println("DB_HOST:", os.Getenv("DB_HOST"))
+	log.Println("DB_PORT:", os.Getenv("DB_PORT"))
+	log.Println("DB_USER:", os.Getenv("DB_USER"))
 }

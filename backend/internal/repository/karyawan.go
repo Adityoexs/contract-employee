@@ -25,7 +25,7 @@ func NewKaryawanRepository(db *sql.DB) *KaryawanRepository {
 func (r *KaryawanRepository) FindAll() ([]model.Karyawan, error) {
 	rows, err := r.db.Query(
 		`SELECT id, kode, nama, tanggal_mulai, tanggal_habis, created_at, updated_at
-		 FROM karyawan_kontrak ORDER BY id ASC`,
+		 FROM public.karyawan_kontrak ORDER BY id ASC`,
 	)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (r *KaryawanRepository) FindByID(id int) (*model.Karyawan, error) {
 	var k model.Karyawan
 	err := r.db.QueryRow(
 		`SELECT id, kode, nama, tanggal_mulai, tanggal_habis, created_at, updated_at
-		 FROM karyawan_kontrak WHERE id = $1`,
+		 FROM public.karyawan_kontrak WHERE id = $1`,
 		id,
 	).Scan(&k.ID, &k.Kode, &k.Nama, &k.TanggalMulai, &k.TanggalHabis, &k.CreatedAt, &k.UpdatedAt)
 	if err != nil {
@@ -61,7 +61,7 @@ func (r *KaryawanRepository) FindByID(id int) (*model.Karyawan, error) {
 func (r *KaryawanRepository) KodeExists(kode string, excludeID int) (bool, error) {
 	var count int
 	err := r.db.QueryRow(
-		`SELECT COUNT(*) FROM karyawan_kontrak WHERE kode = $1 AND id <> $2`,
+		`SELECT COUNT(*) FROM public.karyawan_kontrak WHERE kode = $1 AND id <> $2`,
 		strings.TrimSpace(kode), excludeID,
 	).Scan(&count)
 	if err != nil {
@@ -83,7 +83,7 @@ func (r *KaryawanRepository) Create(req model.KaryawanRequest) (*model.Karyawan,
 
 	var k model.Karyawan
 	err = r.db.QueryRow(
-		`INSERT INTO karyawan_kontrak (kode, nama, tanggal_mulai, tanggal_habis)
+		`INSERT INTO public.karyawan_kontrak (kode, nama, tanggal_mulai, tanggal_habis)
 		 VALUES ($1, $2, $3, $4)
 		 RETURNING id, kode, nama, tanggal_mulai, tanggal_habis, created_at, updated_at`,
 		strings.TrimSpace(req.Kode), strings.TrimSpace(req.Nama), tm, th,
@@ -107,7 +107,7 @@ func (r *KaryawanRepository) Update(id int, req model.KaryawanRequest) (*model.K
 
 	var k model.Karyawan
 	err = r.db.QueryRow(
-		`UPDATE karyawan_kontrak
+		`UPDATE public.karyawan_kontrak
 		 SET kode=$1, nama=$2, tanggal_mulai=$3, tanggal_habis=$4, updated_at=NOW()
 		 WHERE id=$5
 		 RETURNING id, kode, nama, tanggal_mulai, tanggal_habis, created_at, updated_at`,
@@ -121,7 +121,7 @@ func (r *KaryawanRepository) Update(id int, req model.KaryawanRequest) (*model.K
 
 // Delete removes a karyawan by id.
 func (r *KaryawanRepository) Delete(id int) error {
-	res, err := r.db.Exec(`DELETE FROM karyawan_kontrak WHERE id = $1`, id)
+	res, err := r.db.Exec(`DELETE FROM public.karyawan_kontrak WHERE id = $1`, id)
 	if err != nil {
 		return err
 	}
