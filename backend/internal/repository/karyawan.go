@@ -10,7 +10,7 @@ import (
 	"github.com/Adityoexs/contract-employee/backend/internal/model"
 )
 
-const dateLayout = "2006-01-02"
+const dateLayout = model.DateLayout
 
 // KaryawanRepository handles DB operations for karyawan_kontrak.
 type KaryawanRepository struct {

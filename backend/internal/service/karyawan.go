@@ -11,7 +11,7 @@ import (
 	"github.com/Adityoexs/contract-employee/backend/internal/repository"
 )
 
-const dateLayout = "2006-01-02"
+const dateLayout = model.DateLayout
 
 // ValidationError carries field-level validation messages returned by the
 // service layer so that handlers can translate them into 422 responses.

@@ -17,7 +17,6 @@ import (
 const (
 	maxImportSize = 500 * 1024 // 500 KB
 	importSheet   = "Karyawan"
-	dateLayout    = "2006-01-02"
 )
 
 // ImportExcel godoc – POST /api/karyawan/import
@@ -261,7 +260,7 @@ func validateImportRows(allRows [][]string) ([]model.ImportRow, []model.ImportEr
 			errors = append(errors, model.ImportError{Row: rowNum, Field: "tanggal_mulai", Message: "Tanggal mulai wajib diisi"})
 			rowOK = false
 		} else {
-			tm, errTm = time.Parse(dateLayout, mulai)
+			tm, errTm = time.Parse(model.DateLayout, mulai)
 			if errTm != nil {
 				errors = append(errors, model.ImportError{Row: rowNum, Field: "tanggal_mulai", Message: "Format tanggal mulai tidak valid (gunakan YYYY-MM-DD)"})
 				rowOK = false
@@ -272,7 +271,7 @@ func validateImportRows(allRows [][]string) ([]model.ImportRow, []model.ImportEr
 			errors = append(errors, model.ImportError{Row: rowNum, Field: "tanggal_habis", Message: "Tanggal habis wajib diisi"})
 			rowOK = false
 		} else {
-			th, errTh = time.Parse(dateLayout, habis)
+			th, errTh = time.Parse(model.DateLayout, habis)
 			if errTh != nil {
 				errors = append(errors, model.ImportError{Row: rowNum, Field: "tanggal_habis", Message: "Format tanggal habis tidak valid (gunakan YYYY-MM-DD)"})
 				rowOK = false

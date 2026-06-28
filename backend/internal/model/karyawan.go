@@ -2,6 +2,9 @@ package model
 
 import "time"
 
+// DateLayout is the canonical date format used across create/update flows.
+const DateLayout = "2006-01-02"
+
 // Karyawan represents a contract employee record.
 type Karyawan struct {
 	ID           int       `db:"id"            json:"id"`
