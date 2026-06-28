@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { KaryawanRequest } from '../types/karyawan';
+import type { KaryawanUpdateRequest } from '../types/karyawan';
 
 const schema = z
   .object({
@@ -31,8 +31,8 @@ const schema = z
 type FormValues = z.infer<typeof schema>;
 
 interface Props {
-  defaultValues?: Partial<KaryawanRequest>;
-  onSubmit: (data: KaryawanRequest) => Promise<void>;
+  defaultValues?: Partial<KaryawanUpdateRequest>;
+  onSubmit: (data: KaryawanUpdateRequest) => Promise<void>;
   serverErrors?: Record<string, string>;
   isSubmitting?: boolean;
   submitLabel?: string;

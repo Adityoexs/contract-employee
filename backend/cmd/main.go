@@ -7,6 +7,7 @@ import (
 	"github.com/Adityoexs/contract-employee/backend/internal/db"
 	"github.com/Adityoexs/contract-employee/backend/internal/handler"
 	"github.com/Adityoexs/contract-employee/backend/internal/repository"
+	"github.com/Adityoexs/contract-employee/backend/internal/service"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -32,9 +33,10 @@ func main() {
 	}
 	log.Printf("MAIN connected to database=%s schema=%s search_path=%s", currentDB, currentSchema, searchPath)
 
-	// Repository & Handler
+	// Repository, Service & Handler
 	repo := repository.NewKaryawanRepository(dbConn)
-	h := handler.NewKaryawanHandler(repo)
+	svc := service.NewKaryawanService(repo)
+	h := handler.NewKaryawanHandler(svc)
 
 	// Router
 	r := gin.Default()

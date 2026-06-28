@@ -82,14 +82,14 @@ func (h *KaryawanHandler) ImportExcel(c *gin.Context) {
 		return
 	}
 
-	startSeq, err := h.repo.FindMaxKodeSequence()
+	startSeq, err := h.svc.FindMaxKodeSequence()
 	if err != nil {
 		respond(c, http.StatusInternalServerError, "Gagal membaca data kode", nil, err.Error())
 		return
 	}
 	startSeq++ // first new kode is max+1
 
-	inserted, err := h.repo.BulkCreate(rows, startSeq)
+	inserted, err := h.svc.BulkCreate(rows, startSeq)
 	if err != nil {
 		respond(c, http.StatusInternalServerError, "Gagal menyimpan data", nil, err.Error())
 		return
@@ -260,7 +260,7 @@ func validateImportRows(allRows [][]string) ([]model.ImportRow, []model.ImportEr
 			errors = append(errors, model.ImportError{Row: rowNum, Field: "tanggal_mulai", Message: "Tanggal mulai wajib diisi"})
 			rowOK = false
 		} else {
-			tm, errTm = time.Parse(dateLayout, mulai)
+			tm, errTm = time.Parse(model.DateLayout, mulai)
 			if errTm != nil {
 				errors = append(errors, model.ImportError{Row: rowNum, Field: "tanggal_mulai", Message: "Format tanggal mulai tidak valid (gunakan YYYY-MM-DD)"})
 				rowOK = false
@@ -271,7 +271,7 @@ func validateImportRows(allRows [][]string) ([]model.ImportRow, []model.ImportEr
 			errors = append(errors, model.ImportError{Row: rowNum, Field: "tanggal_habis", Message: "Tanggal habis wajib diisi"})
 			rowOK = false
 		} else {
-			th, errTh = time.Parse(dateLayout, habis)
+			th, errTh = time.Parse(model.DateLayout, habis)
 			if errTh != nil {
 				errors = append(errors, model.ImportError{Row: rowNum, Field: "tanggal_habis", Message: "Format tanggal habis tidak valid (gunakan YYYY-MM-DD)"})
 				rowOK = false
