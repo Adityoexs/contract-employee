@@ -45,12 +45,10 @@ export const karyawanService = {
   importExcel(file: File): Promise<ApiResponse<{ inserted: number }>> {
     const form = new FormData();
     form.append('file', file);
-    return axios
-      .post<ApiResponse<{ inserted: number }>>(
-        `${import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api'}/karyawan/import`,
-        form,
-        { headers: { 'Content-Type': 'multipart/form-data' } },
-      )
+    return http
+      .post<ApiResponse<{ inserted: number }>>('/karyawan/import', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
       .then((r) => r.data);
   },
 };

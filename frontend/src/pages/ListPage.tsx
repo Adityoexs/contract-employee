@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { karyawanService } from '../services/karyawanService';
-import type { Karyawan } from '../types/karyawan';
+import type { ImportError, Karyawan } from '../types/karyawan';
 
 function formatDate(iso: string): string {
   if (!iso) return '-';
@@ -73,7 +73,7 @@ export default function ListPage() {
       const axiosErr = err as { response?: { data?: { message?: string; errors?: unknown } } };
       const detail = axiosErr?.response?.data;
       if (detail?.errors && Array.isArray(detail.errors)) {
-        const msgs = (detail.errors as Array<{ row: number; field: string; message: string }>)
+        const msgs = (detail.errors as ImportError[])
           .slice(0, 3)
           .map((e) => `Baris ${e.row} (${e.field}): ${e.message}`)
           .join('\n');
