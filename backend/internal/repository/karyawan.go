@@ -22,6 +22,10 @@ func NewKaryawanRepository(db *sql.DB) *KaryawanRepository {
 	return &KaryawanRepository{db: db}
 }
 
+func GenerateKode(next int) string {
+	return fmt.Sprintf("KAR-%03d", next)
+}
+
 // FindAll returns all karyawan records.
 func (r *KaryawanRepository) FindAll() ([]model.Karyawan, error) {
 	rows, err := r.db.Query(
@@ -71,8 +75,19 @@ func (r *KaryawanRepository) KodeExists(kode string, excludeID int) (bool, error
 	return count > 0, nil
 }
 
+func (r *KaryawanRepository) generateKode(tx *sql.Tx) (string, error) {
+	var lastID sql.NullInt64
+	err := tx.QueryRow(`SELECT COALESCE(MAX(id), 0) FROM public.karyawan_kontrak`).Scan(&lastID)
+	if err != nil {
+		return "", err
+	}
+
+	next := int(lastID.Int64) + 1
+	return fmt.Sprintf("KAR-%03d", next), nil
+}
+
 // Create inserts a new karyawan and returns it with generated id.
-func (r *KaryawanRepository) Create(req model.KaryawanRequest) (*model.Karyawan, error) {
+func (r *KaryawanRepository) Create(req model.KaryawanCreateRequest) (*model.Karyawan, error) {
 	tm, err := time.Parse(dateLayout, req.TanggalMulai)
 	if err != nil {
 		return nil, errors.New("tanggal_mulai format tidak valid")
@@ -82,12 +97,23 @@ func (r *KaryawanRepository) Create(req model.KaryawanRequest) (*model.Karyawan,
 		return nil, errors.New("tanggal_habis format tidak valid")
 	}
 
+	tx, err := r.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	kode, err := r.generateKode(tx)
+	if err != nil {
+		return nil, err
+	}
+
 	var k model.Karyawan
 	err = r.db.QueryRow(
 		`INSERT INTO public.karyawan_kontrak (kode, nama, tanggal_mulai, tanggal_habis)
 		 VALUES ($1, $2, $3, $4)
 		 RETURNING id, kode, nama, tanggal_mulai, tanggal_habis, created_at, updated_at`,
-		strings.TrimSpace(req.Kode), strings.TrimSpace(req.Nama), tm, th,
+		kode, strings.TrimSpace(req.Nama), tm, th,
 	).Scan(&k.ID, &k.Kode, &k.Nama, &k.TanggalMulai, &k.TanggalHabis, &k.CreatedAt, &k.UpdatedAt)
 	if err != nil {
 		return nil, err
@@ -96,7 +122,7 @@ func (r *KaryawanRepository) Create(req model.KaryawanRequest) (*model.Karyawan,
 }
 
 // Update modifies an existing karyawan and returns the updated record.
-func (r *KaryawanRepository) Update(id int, req model.KaryawanRequest) (*model.Karyawan, error) {
+func (r *KaryawanRepository) Update(id int, req model.KaryawanUpdateRequest) (*model.Karyawan, error) {
 	tm, err := time.Parse(dateLayout, req.TanggalMulai)
 	if err != nil {
 		return nil, errors.New("tanggal_mulai format tidak valid")

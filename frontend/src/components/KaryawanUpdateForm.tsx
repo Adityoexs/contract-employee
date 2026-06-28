@@ -6,10 +6,10 @@ import type { KaryawanRequest } from '../types/karyawan';
 
 const schema = z
   .object({
-    // kode: z
-    //   .string()
-    //   .min(1, 'Kode wajib diisi')
-    //   .refine((v) => v.trim().length > 0, 'Kode tidak boleh hanya spasi'),
+    kode: z
+      .string()
+      .min(1, 'Kode wajib diisi')
+      .refine((v) => v.trim().length > 0, 'Kode tidak boleh hanya spasi'),
     nama: z
       .string()
       .min(1, 'Nama wajib diisi')
@@ -53,7 +53,7 @@ export default function KaryawanForm({
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      // kode: defaultValues?.kode ?? '',
+      kode: defaultValues?.kode ?? '',
       nama: defaultValues?.nama ?? '',
       tanggal_mulai: defaultValues?.tanggal_mulai?.slice(0, 10) ?? '',
       tanggal_habis: defaultValues?.tanggal_habis?.slice(0, 10) ?? '',
@@ -72,11 +72,11 @@ export default function KaryawanForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="form">
-      {/* <div className="form-group">
+      <div className="form-group">
         <label htmlFor="kode">Kode Karyawan <span className="required">*</span></label>
         <input id="kode" type="text" placeholder="Contoh: EMP001" {...register('kode')} />
         {errors.kode && <p className="field-error">{errors.kode.message}</p>}
-      </div> */}
+      </div>
 
       <div className="form-group">
         <label htmlFor="nama">Nama <span className="required">*</span></label>

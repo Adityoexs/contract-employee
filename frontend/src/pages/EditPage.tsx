@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { isAxiosError } from 'axios';
-import KaryawanForm from '../components/KaryawanForm';
+import KaryawanUpdateForm from '../components/KaryawanUpdateForm';
 import { karyawanService } from '../services/karyawanService';
 import type { Karyawan, KaryawanRequest } from '../types/karyawan';
 
@@ -75,7 +75,7 @@ export default function EditPage() {
       </div>
 
       <div className="form-card">
-        <KaryawanForm
+        <KaryawanUpdateForm
           defaultValues={{
             kode: data.kode,
             nama: data.nama,

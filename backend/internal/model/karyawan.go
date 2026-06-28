@@ -14,7 +14,14 @@ type Karyawan struct {
 }
 
 // KaryawanRequest is the payload for create/update operations.
-type KaryawanRequest struct {
+type KaryawanCreateRequest struct {
+	Nama         string `json:"nama"`
+	TanggalMulai string `json:"tanggal_mulai"`
+	TanggalHabis string `json:"tanggal_habis"`
+}
+
+// KaryawanUpdateRequest is used when updating a record.
+type KaryawanUpdateRequest struct {
 	Kode         string `json:"kode"`
 	Nama         string `json:"nama"`
 	TanggalMulai string `json:"tanggal_mulai"`

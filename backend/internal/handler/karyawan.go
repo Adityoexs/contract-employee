@@ -41,7 +41,56 @@ func respond(c *gin.Context, status int, message string, data interface{}, errs 
 
 // validateRequest validates the incoming KaryawanRequest and returns a map of
 // field -> error message. An empty map means the request is valid.
-func validateRequest(req model.KaryawanRequest, excludeID int, repo *repository.KaryawanRepository) map[string]string {
+func validateCreateRequest(req model.KaryawanCreateRequest) map[string]string {
+	errs := make(map[string]string)
+
+	// if strings.TrimSpace(req.Kode) == "" {
+	// 	errs["kode"] = "Kode wajib diisi dan tidak boleh kosong/spasi"
+	// } else {
+	// 	exists, err := repo.KodeExists(req.Kode, excludeID)
+	// 	if err != nil {
+	// 		errs["kode"] = "Gagal memvalidasi kode"
+	// 	} else if exists {
+	// 		errs["kode"] = "Kode sudah digunakan, gunakan kode yang lain"
+	// 	}
+	// }
+
+	if strings.TrimSpace(req.Nama) == "" {
+		errs["nama"] = "Nama wajib diisi dan tidak boleh kosong/spasi"
+	}
+
+	var tm, th time.Time
+	var errTm, errTh error
+
+	if strings.TrimSpace(req.TanggalMulai) == "" {
+		errs["tanggal_mulai"] = "Tanggal mulai wajib diisi"
+	} else {
+		tm, errTm = time.Parse(dateLayout, req.TanggalMulai)
+		if errTm != nil {
+			errs["tanggal_mulai"] = "Format tanggal mulai tidak valid (gunakan YYYY-MM-DD)"
+		}
+	}
+
+	if strings.TrimSpace(req.TanggalHabis) == "" {
+		errs["tanggal_habis"] = "Tanggal habis wajib diisi"
+	} else {
+		th, errTh = time.Parse(dateLayout, req.TanggalHabis)
+		if errTh != nil {
+			errs["tanggal_habis"] = "Format tanggal habis tidak valid (gunakan YYYY-MM-DD)"
+		}
+	}
+
+	// Cross-field validation
+	if errTm == nil && errTh == nil && !tm.IsZero() && !th.IsZero() {
+		if th.Before(tm) {
+			errs["tanggal_habis"] = "Tanggal habis harus lebih besar atau sama dengan tanggal mulai"
+		}
+	}
+
+	return errs
+}
+
+func validateUpdateRequest(req model.KaryawanUpdateRequest, excludeID int, repo *repository.KaryawanRepository) map[string]string {
 	errs := make(map[string]string)
 
 	if strings.TrimSpace(req.Kode) == "" {
@@ -80,7 +129,6 @@ func validateRequest(req model.KaryawanRequest, excludeID int, repo *repository.
 		}
 	}
 
-	// Cross-field validation
 	if errTm == nil && errTh == nil && !tm.IsZero() && !th.IsZero() {
 		if th.Before(tm) {
 			errs["tanggal_habis"] = "Tanggal habis harus lebih besar atau sama dengan tanggal mulai"
@@ -129,13 +177,13 @@ func (h *KaryawanHandler) GetByID(c *gin.Context) {
 
 // Create godoc – POST /api/karyawan
 func (h *KaryawanHandler) Create(c *gin.Context) {
-	var req model.KaryawanRequest
+	var req model.KaryawanCreateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		respond(c, http.StatusBadRequest, "Request tidak valid", nil, err.Error())
 		return
 	}
 
-	if errs := validateRequest(req, 0, h.repo); len(errs) > 0 {
+	if errs := validateCreateRequest(req); len(errs) > 0 {
 		respond(c, http.StatusUnprocessableEntity, "Validasi gagal", nil, errs)
 		return
 	}
@@ -156,13 +204,13 @@ func (h *KaryawanHandler) Update(c *gin.Context) {
 		return
 	}
 
-	var req model.KaryawanRequest
+	var req model.KaryawanUpdateRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		respond(c, http.StatusBadRequest, "Request tidak valid", nil, err.Error())
 		return
 	}
 
-	if errs := validateRequest(req, id, h.repo); len(errs) > 0 {
+	if errs := validateUpdateRequest(req, id, h.repo); len(errs) > 0 {
 		respond(c, http.StatusUnprocessableEntity, "Validasi gagal", nil, errs)
 		return
 	}
